@@ -1,21 +1,64 @@
-﻿export class eduPageClient {
+﻿export default class eduPageClient {
 	#teacherTable = {}
 	#subjectTable = {}
 	#classroomTable = {}
 	#classesTable = {}
 	#periodsTable = {}
 	#scheduleTable = {}
-	constructor(class_, week) {
-		if(class_ === undefined) throw new Error("No class given")
-		this.class = class_
+	#class
+	#onIntelUpdate
 
-		if(week === undefined) {
-			console.warn("No week given, in result set to 0")
-			this.week = 0
-		} else this.week = week
+	constructor(class_, week, onIntelUpdateFunction) {
+		this.#onIntelUpdate = onIntelUpdateFunction
 
-		this.updateStaticContent()
-		this.updateDynamicContent()
+		this.updateStaticContent().then(() => {
+			if (this.#classesTable[class_] === undefined) {
+				console.warn("No class given, set to first class from the list")
+				this.#class = Object.keys(this.#classesTable)[0]
+			} else this.#class = class_
+
+			if (week === undefined) {
+				console.warn("No week given, in result set to 0")
+				this.week = 0
+			} else this.week = week
+
+			this.updateDynamicContent()
+		})
+	}
+
+	static async getClasses() {
+		const requestPayload = {
+			"__args": [
+				null,
+				new Date().getFullYear(), // This year
+				{},
+				{
+					"op": "fetch",
+					"needed_part": {
+						"classes": [
+							"short",
+							"name"
+						]
+					}
+				}
+			],
+			"__gsh": "00000000"
+		}
+		const response = await fetch("https://cors-anywhere.herokuapp.com/https://svg.edupage.org/rpr/server/maindbi.js?__func=mainDBIAccessor", {
+			method: "POST",
+			body: JSON.stringify(requestPayload)
+		})
+
+		let result = await response.text()
+		result = JSON.parse(result)["r"]["tables"][0]["data_rows"]
+
+		let classes = {}
+
+		for (let class_ in result) {
+			classes[result[class_]["name"]] = result[class_]["id"]
+		}
+
+		return classes
 	}
 
 	async updateStaticContent() {
@@ -157,13 +200,16 @@
 	}
 
 	async updateDynamicContent() {
+		// TODO: Implement multiple periods long lessons(can tell by individual lesson start and end times)
+		this.#scheduleTable = {}
+
 		const currentttGetDataPayload = {
 			"__args": [null, {
 				"year": 2024,
 				"datefrom": this.currentWeekDates().firstDay,
 				"dateto": this.currentWeekDates().lastDay,
 				"table": "classes",
-				"id": String(this.class),
+				"id": String(this.#class),
 				"showColors": true,
 				"showIgroupsInClasses": false,
 				"showOrig": true,
@@ -176,81 +222,85 @@
 		})
 
 		const responseObj = JSON.parse(await response.text())["r"]["ttitems"]
-		for(let lesson in responseObj) {
+		for (let lesson in responseObj) {
 			lesson = responseObj[lesson]
-			if(this.#scheduleTable[lesson["date"]] === undefined)
-				this.#scheduleTable[lesson["date"]] = {};
-			if(this.#scheduleTable[lesson["date"]][lesson["uniperiod"]] === undefined)
-				this.#scheduleTable[lesson["date"]][lesson["uniperiod"]] = [];
+			if (this.#scheduleTable[lesson["date"]] === undefined)
+				this.#scheduleTable[lesson["date"]] = {}
+			if (this.#scheduleTable[lesson["date"]][lesson["uniperiod"]] === undefined)
+				this.#scheduleTable[lesson["date"]][lesson["uniperiod"]] = []
 
 			this.#scheduleTable[lesson["date"]][lesson["uniperiod"]].push({
 				"subjectId": lesson["subjectid"],
 				"classIDs": lesson["classids"],
 				"groupNames": lesson["groupnames"],
 				"teacherIDs": lesson["teacherids"],
-				"classroomIDs": lesson["classroomids"],
-			});
+				"classroomIDs": lesson["classroomids"]
+			})
 		}
+
 		console.log(this.#scheduleTable)
+		this.#onIntelUpdate()
 	}
 
 	async incrementWeek(amount) {
-		this.week += amount;
+		this.week += amount
 
 		await this.updateDynamicContent()
 	}
 
+	changeClass(newClass) {
+		if (this.#classesTable[newClass] === undefined)
+			console.warn("Invalid class given (" + newClass + ") to changeClass function, class unchanged")
+		else {
+			this.#class = newClass
+			this.updateDynamicContent()
+		}
+	}
+
 	// Returns the date of the first and the last day of the current week
 	currentWeekDates() {
-		const today = new Date();
+		const today = new Date()
 
 		// Get the current day of the week (0 for Sunday, 6 for Saturday)
-		const dayOfWeek = today.getDay();
+		const dayOfWeek = today.getDay()
 
-		const firstDayOfWeek = new Date(today);
-		firstDayOfWeek.setDate(today.getDate() - dayOfWeek + (this.week * 7));
+		const firstDayOfWeek = new Date(today)
+		firstDayOfWeek.setDate(today.getDate() - dayOfWeek + (this.week * 7))
 
-		const lastDayOfWeek = new Date(today);
-		lastDayOfWeek.setDate(today.getDate() + (6 - dayOfWeek) + (this.week * 7));
+		const lastDayOfWeek = new Date(today)
+		lastDayOfWeek.setDate(today.getDate() + (6 - dayOfWeek) + (this.week * 7))
 
 		return {
 			firstDay: firstDayOfWeek.toISOString().slice(0, 10),
 			lastDay: lastDayOfWeek.toISOString().slice(0, 10)
-		};
+		}
 	}
 
-	static async getClasses() {
-		const requestPayload = {
-			"__args": [
-				null,
-				new Date().getFullYear(), // This year
-				{},
-				{
-					"op": "fetch",
-					"needed_part": {
-						"classes": [
-							"short",
-							"name"
-						]
-					}
-				}
-			],
-			"__gsh": "00000000"
-		}
-		const response = await fetch("https://cors-anywhere.herokuapp.com/https://svg.edupage.org/rpr/server/maindbi.js?__func=mainDBIAccessor", {
-			method: "POST",
-			body: JSON.stringify(requestPayload)
-		})
+	getSchedule() {
+		return this.#scheduleTable
+	}
 
-		let result = await response.text()
-		result = JSON.parse(result)["r"]["tables"][0]["data_rows"]
+	getTeachers() {
+		return this.#teacherTable
+	}
 
-		let classes = {}
+	getSubjects() {
+		return this.#subjectTable
+	}
 
-		for(let class_ in result) {
-			classes[result[class_]["name"]] = result[class_]["id"]
-		}
+	getClassrooms() {
+		return this.#classroomTable
+	}
 
-		return classes
+	getClasses() {
+		return this.#classesTable
+	}
+
+	getCurClass() {
+		return this.#class
+	}
+
+	getPeriodsTimes() {
+		return this.#periodsTable
 	}
 }

@@ -1,0 +1,108 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+
+*, *:before, *:after {
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    background-color: hsl(var(--accentHue), 100%, 95%);
+    font-family: "Roboto", sans-serif;
+    --accentHue: 260deg;
+    --accentColor: hsl(var(--accentHue), 100%, 50%);
+    --accentColorDarker: hsl(var(--accentHue), 100%, 40%);
+    --borderRadius: 4px;
+}
+
+#topBar {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    box-shadow: 0 0 16px hsl(var(--accentHue), 100%, 80%);
+    padding: 0.5rem 0;
+    justify-content: space-around;
+    background-color: white;
+}
+
+#topBarElements {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+#topBar h5, #topBar h4 {
+    font-weight: 300;
+}
+
+#classSelecter {
+    display: flex;
+    flex-direction: row;
+}
+
+select, #selectClass {
+    font-size: 1rem;
+    padding: 0.5rem;
+}
+
+select {
+    border: 2px solid var(--accentColor);
+    border-radius: var(--borderRadius) 0 0 var(--borderRadius);
+    border-right: none;
+    outline: none;
+}
+
+#selectClass {
+    display: flex;
+    flex-grow: 1;
+    align-items: center;
+    border: none;
+    background-color: var(--accentColor);
+    border-radius: 0 var(--borderRadius) var(--borderRadius) 0;
+    color: white;
+    padding-right: 1rem;
+    padding-left: 1rem;
+}
+#selectClass:hover {
+    background-color: var(--accentColorDarker);
+}
+
+#schedule {
+    margin: 2rem;
+    gap: 1rem;
+    display: flex;
+}
+#schedule > * {
+    flex-grow: 1;
+    flex-basis: 0;
+}
+
+#schedule .day {
+    /*display: flex;*/
+    /*flex-direction: column;*/
+    /*background-color: var(--accentColor);*/
+}
+#schedule .day > * {
+    height: 3rem;
+}
+
+#schedule .topRow {
+    text-align: center;
+}
+
+#schedule .period {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#schedule .period .leftCol {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+}
+
+#schedule .period span {
+    font-size: 2rem;
+    font-weight: 300;
+}

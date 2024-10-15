@@ -3,19 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <title>SSG ScheMerge</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="stylesheets/style.css">
+    <link rel="stylesheet" href="stylesheets/textSizing.css">
 </head>
 <body>
   <div id="topBar">
     <div id="topBarElements">
-      <h1>SSG ScheMerge</h1>
-      <select id="class">
-        <option value="">Izvēlies klasi</option>
-        <option value="">9.B</option>
-      </select>
+      <h4>SSG ScheMerge</h4>
+        <div id="classSelecter">
+            <select id="class">
+                <option value="">Izvēlies klasi</option>
+            </select>
+            <button id="selectClass">Atlasīt</button>
+        </div>
     </div>
   </div>
-  
+  <div id="schedule">
+      <div class="day">
+          <div class="topRow">
+              <h5>Pirmdiena</h5>
+              <p>14. oktobris</p>
+          </div>
+          <div class="period">
+              <div class="leftCol">
+                  <h6>Matemātika</h6>
+                  <p class="teacher">Daiga Jēkabsone</p>
+              </div>
+              <span class="class">214</span>
+          </div>
+      </div>
+      <div class="day">
+          aaa2
+      </div>
+  </div>
   <script src="index.js" type="module"></script>
 </body>
 </html>
