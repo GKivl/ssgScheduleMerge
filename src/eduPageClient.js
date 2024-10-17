@@ -200,7 +200,6 @@
 	}
 
 	async updateDynamicContent() {
-		// TODO: Implement multiple periods long lessons(can tell by individual lesson start and end times)
 		this.#scheduleTable = {}
 
 		const currentttGetDataPayload = {
@@ -229,12 +228,33 @@
 			if (this.#scheduleTable[lesson["date"]][lesson["uniperiod"]] === undefined)
 				this.#scheduleTable[lesson["date"]][lesson["uniperiod"]] = []
 
+			let length = 0
+			let foundStart = false
+			for(let period in this.#periodsTable) {
+				if(!foundStart) {
+					// Ends up as [hours, minutes]
+					const lessonStartTime = lesson["starttime"].split(':')
+					const periodStartTime = this.#periodsTable[period]["startTime"].split(':')
+
+					if(periodStartTime[0] >= lessonStartTime[0] && periodStartTime[1] >= lessonStartTime[1])
+						foundStart = true
+				}
+				if(foundStart) {
+					const lessonEndTime = lesson["endtime"].split(':')
+					const periodEndTime = this.#periodsTable[period]["endTime"].split(':')
+
+					if(lessonEndTime[0] <= periodEndTime[0] && lessonEndTime[1] <= periodEndTime[1])
+						length++
+				}
+			}
+
 			this.#scheduleTable[lesson["date"]][lesson["uniperiod"]].push({
 				"subjectId": lesson["subjectid"],
 				"classIDs": lesson["classids"],
 				"groupNames": lesson["groupnames"],
 				"teacherIDs": lesson["teacherids"],
-				"classroomIDs": lesson["classroomids"]
+				"classroomIDs": lesson["classroomids"],
+				"length": length
 			})
 		}
 
