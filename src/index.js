@@ -72,6 +72,52 @@ function regenContent() {
 			newCol.appendChild(newPeriod)
 		}
 
-		scheduleEl.appendChild(newCol)
+		// scheduleEl.appendChild(newCol)
+	}
+
+	// Top row stuff
+	let topRowEl = document.createElement("tr")
+	for(let day in schedule) {
+		let date = new Date(day)
+		let newTHEl = document.createElement("th")
+		newTHEl.className = "day"
+
+		newTHEl.innerHTML = `
+			<h5>${new Intl.DateTimeFormat(locale, {weekday: 'long'}).format(date)}</h5>
+			<p>${new Intl.DateTimeFormat(locale, {day: 'numeric', month: 'long'}).format(date)}</p>
+		`
+
+		topRowEl.appendChild(newTHEl)
+	}
+	scheduleEl.appendChild(topRowEl)
+
+	// The rest
+	for(let period in periodTimes) {
+		let newTREl = document.createElement("tr")
+
+		for(let day in schedule) {
+			if(schedule[day][period] !== undefined) {
+				const curPeriod = schedule[day][period]
+				const curTeacher = teacherNames[curPeriod[0]["teacherIDs"][0]]
+
+				let newTDEl = document.createElement("td")
+				newTDEl.className = "period"
+				newTDEl.innerHTML = `
+				<div>
+					<div class="leftCol">
+						<h6>${subjectNames[curPeriod[0]["subjectId"]]["short"]}</h6>
+						<p class="taecher">${curTeacher["short"]}</p>
+					</div>
+					<span class="class">${classrooms[curPeriod[0]["classroomIDs"][0]] === undefined ? "" : classrooms[curPeriod[0]["classroomIDs"][0]]}</span>
+				</div>
+				`
+
+				if(curPeriod[0].length > 1)
+					newTDEl.rowSpan = curPeriod[0].length
+
+				newTREl.appendChild(newTDEl)
+			}
+		}
+		scheduleEl.appendChild(newTREl)
 	}
 }

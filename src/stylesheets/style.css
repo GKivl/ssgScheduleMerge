@@ -68,12 +68,6 @@ select {
 
 #schedule {
     margin: 2rem;
-    gap: 1rem;
-    display: flex;
-}
-#schedule > * {
-    flex-grow: 1;
-    flex-basis: 0;
 }
 
 #schedule .day {
@@ -82,14 +76,14 @@ select {
     /*background-color: var(--accentColor);*/
 }
 #schedule .day > * {
-    height: 3rem;
+    /*height: 3rem;*/
 }
 
-#schedule .topRow {
+#schedule .day {
     text-align: center;
 }
 
-#schedule .period {
+#schedule .period > * {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -105,4 +99,8 @@ select {
 #schedule .period span {
     font-size: 2rem;
     font-weight: 300;
+}
+
+td {
+    border: 1px solid black;
 }
