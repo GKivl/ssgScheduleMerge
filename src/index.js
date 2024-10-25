@@ -37,6 +37,7 @@ function regenContent() {
 	const subjectNames = mainEduPageClient.getSubjects()
 	const teacherNames = mainEduPageClient.getTeachers()
 	const classrooms = mainEduPageClient.getClassrooms()
+	const huePerTeachID = 360 / mainEduPageClient.getTeacherCount()
 
 	for(let day in schedule) {
 		let newCol = document.createElement("div")
@@ -102,6 +103,7 @@ function regenContent() {
 
 				let newTDEl = document.createElement("td")
 				newTDEl.className = "period"
+				newTDEl.style.backgroundColor = `hsl(${Math.abs(curPeriod[0]["teacherIDs"][0]) * huePerTeachID}, 100%, 75%)`
 				newTDEl.innerHTML = `
 				<div>
 					<div class="leftCol">

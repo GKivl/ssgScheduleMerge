@@ -67,24 +67,31 @@ select {
 }
 
 #schedule {
-    margin: 2rem;
+    padding: 2rem;
+    table-layout: fixed;
+    width: 100%;
 }
 
-#schedule .day {
-    /*display: flex;*/
-    /*flex-direction: column;*/
-    /*background-color: var(--accentColor);*/
-}
-#schedule .day > * {
-    /*height: 3rem;*/
+#schedule > * {
+    height: 3rem;
 }
 
 #schedule .day {
     text-align: center;
 }
 
+#schedule .period {
+    height: inherit;
+    padding: 0.5rem;
+    background-color: hsl(var(--accentHue), 100%, 80%);
+    border-radius: var(--borderRadius);
+    border: 1px solid black;
+}
+
 #schedule .period > * {
+    height: 100%;
     display: flex;
+    gap: 1rem;
     justify-content: space-between;
     align-items: center;
 }
@@ -97,10 +104,6 @@ select {
 }
 
 #schedule .period span {
-    font-size: 2rem;
+    font-size: 1.5rem;
     font-weight: 300;
-}
-
-td {
-    border: 1px solid black;
 }
