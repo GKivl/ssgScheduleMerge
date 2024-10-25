@@ -228,6 +228,7 @@
 			if (this.#scheduleTable[lesson["date"]][lesson["uniperiod"]] === undefined)
 				this.#scheduleTable[lesson["date"]][lesson["uniperiod"]] = []
 
+			// Determining length of the lesson in periods
 			let length = 0
 			let foundStart = false
 			for(let period in this.#periodsTable) {
@@ -236,15 +237,17 @@
 					const lessonStartTime = lesson["starttime"].split(':')
 					const periodStartTime = this.#periodsTable[period]["startTime"].split(':')
 
-					if(periodStartTime[0] >= lessonStartTime[0] && periodStartTime[1] >= lessonStartTime[1])
+					if(periodStartTime[0] >= lessonStartTime[0] && periodStartTime[1] >= lessonStartTime[1]) {
 						foundStart = true
+					}
 				}
 				if(foundStart) {
 					const lessonEndTime = lesson["endtime"].split(':')
 					const periodEndTime = this.#periodsTable[period]["endTime"].split(':')
 
-					if(lessonEndTime[0] <= periodEndTime[0] && lessonEndTime[1] <= periodEndTime[1])
+					if((lessonEndTime[0] > periodEndTime[0]) || (lessonEndTime[0] === periodEndTime[0] && lessonEndTime[1] >= periodEndTime[1])) {
 						length++
+					}
 				}
 			}
 
@@ -322,5 +325,9 @@
 
 	getPeriodsTimes() {
 		return this.#periodsTable
+	}
+
+	getTeacherCount() {
+		return Object.keys(this.#teacherTable).length
 	}
 }
