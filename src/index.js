@@ -22,7 +22,7 @@ for (let class_ in classesTable) {
 // When the "Select"(Atlasīt) button is clicked
 classSelectButtonEl.onclick = () => {
 	if (mainEduPageClient === undefined) {
-		mainEduPageClient = new eduPageClient(classSelectButtonEl.value, 0, regenContent)
+		mainEduPageClient = new eduPageClient(classSelectEl.value, 0, regenContent)
 	} else {
 		mainEduPageClient.changeClass(classSelectEl.value)
 	}
