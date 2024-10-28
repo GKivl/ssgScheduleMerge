@@ -5,6 +5,7 @@
 	#classesTable = {}
 	#periodsTable = {}
 	#scheduleTable = {}
+	#lessonCountPerPeriod = {}
 	#class
 	#onIntelUpdate
 
@@ -201,6 +202,8 @@
 
 	async updateDynamicContent() {
 		this.#scheduleTable = {}
+		this.#lessonCountPerPeriod = {}
+		this.#lessonCountPerPeriod["max"] = 0
 
 		const currentttGetDataPayload = {
 			"__args": [null, {
@@ -261,6 +264,25 @@
 			})
 		}
 
+		// Gets the amount of active lessons during each period
+		for(let day in this.#scheduleTable) { // Goes through days, like 2024-10-28
+			for(let period in this.#scheduleTable[day]) { // Goes through periods, like 1; 2; 3
+				const periodNum = parseInt(period)
+				for(let lesson in this.#scheduleTable[day][period]) {
+					for(let i = 0; i < this.#scheduleTable[day][period][lesson]["length"]; i++) {
+						if(this.#lessonCountPerPeriod[day] === undefined)
+							this.#lessonCountPerPeriod[day] = {}
+						if(this.#lessonCountPerPeriod[day][periodNum + i] === undefined)
+							this.#lessonCountPerPeriod[day][periodNum + i] = 0
+
+						if(++this.#lessonCountPerPeriod[day][periodNum + i] > this.#lessonCountPerPeriod["max"])
+							this.#lessonCountPerPeriod["max"] = this.#lessonCountPerPeriod[day][periodNum + i]
+					}
+				}
+			}
+		}
+
+		console.log(this.#lessonCountPerPeriod)
 		console.log(this.#scheduleTable)
 		this.#onIntelUpdate()
 	}
