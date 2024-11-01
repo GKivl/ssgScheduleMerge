@@ -349,6 +349,10 @@
 		return this.#periodsTable
 	}
 
+	getLessonCountPerPeriod() {
+		return this.#lessonCountPerPeriod
+	}
+
 	getTeacherCount() {
 		return Object.keys(this.#teacherTable).length
 	}

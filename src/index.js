@@ -37,7 +37,10 @@ function regenContent() {
 	const subjectNames = mainEduPageClient.getSubjects()
 	const teacherNames = mainEduPageClient.getTeachers()
 	const classrooms = mainEduPageClient.getClassrooms()
+	const lessonCountPerPeriod = mainEduPageClient.GetLessonCountPerPeriod()
+
 	const huePerTeachID = 360 / mainEduPageClient.getTeacherCount()
+	const colsPerCol = lessonCountPerPeriod["max"]
 
 	// Probably, don't need this... Why is it here anyway?
 	// for(let day in schedule) {
@@ -84,7 +87,7 @@ function regenContent() {
 		let newTopRowEl = document.createElement("div")
 		newTopRowEl.className = "day"
 
-		newTopRowEl.style.gridColumn = `${n++}`
+		newTopRowEl.style.gridColumn = `${n++} / span ${colsPerCol}`
 		newTopRowEl.style.gridRow = '0'
 
 		newTopRowEl.innerHTML = `
