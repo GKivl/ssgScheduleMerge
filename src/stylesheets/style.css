@@ -68,19 +68,17 @@ select {
 
 #schedule {
     padding: 2rem;
-    table-layout: fixed;
+    gap: 0.5rem;
+    display: grid;
+    box-sizing: border-box;
     width: 100%;
-}
-
-#schedule > * {
-    height: 3rem;
 }
 
 #schedule .day {
     text-align: center;
 }
 
-#schedule .period {
+#schedule .lesson {
     height: inherit;
     padding: 0.5rem;
     background-color: hsl(var(--accentHue), 100%, 80%);
@@ -88,22 +86,21 @@ select {
     border: 1px solid black;
 }
 
-#schedule .period > * {
-    height: 100%;
+#schedule .lesson {
     display: flex;
     gap: 1rem;
     justify-content: space-between;
     align-items: center;
 }
 
-#schedule .period .leftCol {
+#schedule .lesson .leftCol {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     height: 100%;
 }
 
-#schedule .period span {
+#schedule .lesson span {
     font-size: 1.5rem;
     font-weight: 300;
 }
