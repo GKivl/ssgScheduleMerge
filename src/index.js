@@ -32,63 +32,24 @@ function regenContent() {
 	classSelectEl.value = mainEduPageClient.getCurClass()
 	scheduleEl.innerHTML = ""
 
-	const periodTimes = mainEduPageClient.getPeriodsTimes()
 	const schedule = mainEduPageClient.getSchedule()
 	const subjectNames = mainEduPageClient.getSubjects()
 	const teacherNames = mainEduPageClient.getTeachers()
 	const classrooms = mainEduPageClient.getClassrooms()
-	const lessonCountPerPeriod = mainEduPageClient.GetLessonCountPerPeriod()
+	const lessonCountPerPeriod = mainEduPageClient.getLessonCountPerPeriod()
 
 	const huePerTeachID = 360 / mainEduPageClient.getTeacherCount()
 	const colsPerCol = lessonCountPerPeriod["max"]
 
-	// Probably, don't need this... Why is it here anyway?
-	// for(let day in schedule) {
-	// 	let newCol = document.createElement("div")
-	// 	newCol.className = "day"
-	//
-	// 	const date = new Date(day)
-	// 	let topRowElement = document.createElement("div")
-	// 	topRowElement.className = "topRow"
-	// 	topRowElement.innerHTML = `
-	// 		<h5>${new Intl.DateTimeFormat(locale, {weekday: 'long'}).format(date)}</h5>
-	// 		<p>${new Intl.DateTimeFormat(locale, {day: 'numeric', month: 'long'}).format(date)}</p>
-	// 	`
-	//
-	// 	newCol.appendChild(topRowElement)
-	//
-	// 	for(let period in periodTimes) {
-	// 		let newPeriod = document.createElement("div")
-	// 		newPeriod.className = "period"
-	//
-	// 		if(schedule[day][period] !== undefined) {
-	// 			const curPeriod = schedule[day][period]
-	// 			const curTeacher = teacherNames[curPeriod[0]["teacherIDs"][0]]
-	//
-	// 			newPeriod.innerHTML = `
-	// 				<div class="leftCol">
-	// 					<h6>${subjectNames[curPeriod[0]["subjectId"]]["short"]}</h6>
-	// 					<p class="taecher">${curTeacher["short"]}</p>
-	// 				</div>
-	// 				<span class="class">${classrooms[curPeriod[0]["classroomIDs"][0]] === undefined ? "" : classrooms[curPeriod[0]["classroomIDs"][0]]}</span>
-	// 			`
-	// 		}
-	//
-	// 		newCol.appendChild(newPeriod)
-	// 	}
-	//
-	// 	// scheduleEl.appendChild(newCol)
-	// }
-
 	// Creating the elements for the top row
-	let n = 1
+	let n = 0
 	for(let day in schedule) {
 		let date = new Date(day)
 		let newTopRowEl = document.createElement("div")
 		newTopRowEl.className = "day"
 
-		newTopRowEl.style.gridColumn = `${n++} / span ${colsPerCol}`
-		newTopRowEl.style.gridRow = '0'
+		newTopRowEl.style.gridColumn = `${n++ * colsPerCol + 1} / span ${colsPerCol}`
+		newTopRowEl.style.gridRow = '1'
 
 		newTopRowEl.innerHTML = `
 			<h5>${new Intl.DateTimeFormat(locale, {weekday: 'long'}).format(date)}</h5>
@@ -98,33 +59,43 @@ function regenContent() {
 		scheduleEl.appendChild(newTopRowEl)
 	}
 
-	// The rest
-	for(let period in periodTimes) {
-		let n = 1
-		for(let day in schedule) {
-			if(schedule[day][period] !== undefined) {
-				const curPeriod = schedule[day][period]
-				const curTeacher = teacherNames[curPeriod[0]["teacherIDs"][0]]
+	// Adding the lesson elements
+	let maxPeriodCount = 0
+	let dayCnt = 0
+	for(let day in schedule) {
+		for(let period in schedule[day]) {
+
+			const colPerLesson = colsPerCol / lessonCountPerPeriod[day][period]
+			for(let lesson in schedule[day][period]) {
+				lesson = schedule[day][period][lesson]
+				const curTeacher = teacherNames[lesson["teacherIDs"][0]]
 
 				let newLessonEl = document.createElement("div")
 				newLessonEl.className = "lesson"
 
-				newLessonEl.style.gridRow = `${parseInt(period) +1} / span ${curPeriod[0].length}`
-				newLessonEl.style.gridColumn = `${n}`
+				newLessonEl.style.gridRow = `${parseInt(period) + 1} / span ${lesson.length}`
+				newLessonEl.style.gridColumn = `${dayCnt * colsPerCol + 1} / span ${colPerLesson}`
 
-				newLessonEl.style.backgroundColor = `hsl(${Math.abs(curPeriod[0]["teacherIDs"][0]) * huePerTeachID}, 100%, 75%)`
+				newLessonEl.style.backgroundColor = `hsl(${Math.abs(lesson["teacherIDs"][0]) * huePerTeachID}, 100%, 75%)`
 
 				newLessonEl.innerHTML = `
 				<div class="leftCol">
-					<h6>${subjectNames[curPeriod[0]["subjectId"]]["short"]}</h6>
+					<h6>${subjectNames[lesson["subjectId"]]["short"]}</h6>
 					<p class="taecher">${curTeacher["short"]}</p>
 				</div>
-				<span class="class">${classrooms[curPeriod[0]["classroomIDs"][0]] === undefined ? "" : classrooms[curPeriod[0]["classroomIDs"][0]]}</span>
+				<span class="class">${classrooms[lesson["classroomIDs"][0]] === undefined ? "" : classrooms[lesson["classroomIDs"][0]]}</span>
 				`
 
 				scheduleEl.appendChild(newLessonEl)
+
+				if(parseInt(period) + lesson.length > maxPeriodCount) {
+					maxPeriodCount = parseInt(period) + lesson.length
+				}
 			}
-			n++
 		}
+		dayCnt++
 	}
+
+	scheduleEl.style.setProperty("--colCount", String(dayCnt * colsPerCol))
+	scheduleEl.style.setProperty("--rowCount", String(maxPeriodCount))
 }
